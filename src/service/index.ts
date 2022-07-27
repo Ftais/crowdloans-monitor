@@ -129,10 +129,10 @@ export class CrowdloansService {
             const [signer, crowdloan, contributed] = data
             // console.log(ev.toHuman());
             if (section == 'crowdloan' && method == 'Contributed') {
-              logger.info(`In block #${block} find contribute event, signer: ${signer}`)
+              logger.info(`In block #${block} find contribute event, contributed ${contributed} to crowdloan ${crowdloan}, signer: ${signer}`)
               if(signer == getStringEnv('RELAY_SOVEREIGN')) {
                 contribute_list.push({signer, contributed, crowdloan})
-                logger.warn(`In block #${block}, it was found contributed ${contributed} to our crowdloan ${crowdloan}.`)
+                logger.warn(`In block #${block}, it was found contributed ${contributed} to our crowdloan ${crowdloan}, signer: ${signer}.`)
               }
             }
           })
