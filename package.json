@@ -1,0 +1,22 @@
+{
+  "name": "crowdloans-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "fetch": "ts-node src/index.ts -f",
+    "process": "ts-node src/index.ts -p"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@polkadot/api": "^8.14.1",
+    "@polkadot/types": "^8.14.1",
+    "axios": "^0.27.2",
+    "commander": "^9.4.0",
+    "dotenv": "^16.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4",
+    "winston": "^3.8.1"
+  }
+}
