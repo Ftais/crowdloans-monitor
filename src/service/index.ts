@@ -1,6 +1,6 @@
 import { logger } from '../utils/logger'
 import { AuctionInfo, CrowdloansServiceConfig, ExpiredCrowdloan, ParallelCrowdloanStatus, PolkadotCrowdloanStatus } from './types'
-// import { paraApi } from '../api/parallel'
+import { paraApi } from '../api/parallel'
 import { relayApi } from '../api/relay'
 import { ITuple } from '@polkadot/types/types'
 import { Option, u32 } from '@polkadot/types'
@@ -98,7 +98,7 @@ export class CrowdloansService {
       return 
     }
 
-    public async checkContributeInVrf(startBlock: number, endBlock: number) {
+    public async checkRelayContributeInVrf(startBlock: number, endBlock: number) {
       if (!startBlock || !endBlock) return false
       logger.info(`start to check block #${startBlock}-#${endBlock} contribute in vrf`)
       this.checkNum++;
@@ -134,6 +134,48 @@ export class CrowdloansService {
                 contribute_list.push({signer, contributed, crowdloan})
                 logger.warn(`In block #${block}, it was found contributed ${contributed} to our crowdloan ${crowdloan}, signer: ${signer}.`)
               }
+            }
+          })
+          resolve('')
+        }))
+      }
+      await Promise.all(filterEvent)
+      logger.warn(`This vrf found that ${contribute_list.length} contributions.`)
+    }
+
+    public async checkParaContributeInVrf(startBlock: number, endBlock: number) {
+      if (!startBlock || !endBlock) return false
+      logger.info(`start to check block #${startBlock}-#${endBlock} contribute in vrf`)
+      this.checkNum++;
+      let nowBlock = (await paraApi.query.system.number()).toString()
+      if (Number(nowBlock) <= endBlock) {
+        logger.info(`End block is bigger then now Block, need wait ${endBlock - Number(nowBlock)}`)
+        await new Promise(async (resolve, reject) => {
+          const unsubscribe = await paraApi.rpc.chain.subscribeNewHeads((header) => {
+            let nowBlock = header.number.toNumber()
+            if (nowBlock > endBlock) {
+              unsubscribe();
+              resolve(null)
+            }
+          });
+        })
+        
+      }
+      let contribute_list: any = []
+      let filterEvent: any[] = []
+      for(let block=startBlock; block<=endBlock; block++) {
+        filterEvent.push(new Promise(async (resolve, reject) => {
+          // console.log(`get block #${block}`)
+          let blockHash = (await paraApi.rpc.chain.getBlockHash(block)).toString()
+          let events = await paraApi.query.system.events.at(blockHash)
+          // @ts-ignore
+          events.forEach((ev) => {
+            const { event: { method, section, data } } = ev
+            const [crowdloan, vault, signer, contributed] = data
+            // console.log(ev.toHuman());
+            if (section == 'crowdloans' && method == 'VaultDoContributing') {
+              logger.info(`In block #${block} find contribute event, contributed ${contributed} to crowdloan ${crowdloan}, signer: ${signer}`)
+              contribute_list.push({signer, contributed, crowdloan})
             }
           })
           resolve('')

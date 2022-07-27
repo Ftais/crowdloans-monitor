@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "fetch": "ts-node src/index.ts -f",
+    "fetch-relay": "ts-node src/index.ts -fr",
+    "fetch-para": "ts-node src/index.ts -fp",
     "process": "ts-node src/index.ts -p"
   },
   "author": "",
