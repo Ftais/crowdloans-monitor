@@ -118,7 +118,7 @@ export class CrowdloansService {
       }
       let contribute_list: any = []
       for(let block=startBlock; block<=endBlock; block++) {
-        // logger.info(`get block #${block}`)     
+        console.log(`get block #${block}`)     
         let blockHash = (await relayApi.rpc.chain.getBlockHash(block)).toString()
         
         let events = await relayApi.query.system.events.at(blockHash)

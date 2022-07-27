@@ -43,7 +43,7 @@ main()
   .then(() => process.exit(0))
   .catch(e => {
     logger.error(e.message)
-    process.exit(1)
+    // process.exit(1)
   })
 
 process.on('unhandledRejection', err => logger.error(err))
