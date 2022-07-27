@@ -117,25 +117,29 @@ export class CrowdloansService {
         
       }
       let contribute_list: any = []
+      let filterEvent: any[] = []
       for(let block=startBlock; block<=endBlock; block++) {
-        console.log(`get block #${block}`)     
-        let blockHash = (await relayApi.rpc.chain.getBlockHash(block)).toString()
-        
-        let events = await relayApi.query.system.events.at(blockHash)
-        // @ts-ignore
-        events.forEach((ev) => {
-          const { event: { method, section, data } } = ev
-          const [signer, crowdloan, contributed] = data
-          // console.log(ev.toHuman());
-          if (section == 'crowdloan' && method == 'Contributed') {
-            logger.info(`In block #${block} find contribute event, signer: ${signer}`)
-            if(signer == getStringEnv('RELAY_SOVEREIGN')) {
-              contribute_list.push({signer, contributed, crowdloan})
-              logger.warn(`In block #${block}, it was found contributed ${contributed} to our crowdloan ${crowdloan}.`)
+        filterEvent.push(new Promise(async (resolve, reject) => {
+          // console.log(`get block #${block}`)
+          let blockHash = (await relayApi.rpc.chain.getBlockHash(block)).toString()
+          let events = await relayApi.query.system.events.at(blockHash)
+          // @ts-ignore
+          events.forEach((ev) => {
+            const { event: { method, section, data } } = ev
+            const [signer, crowdloan, contributed] = data
+            // console.log(ev.toHuman());
+            if (section == 'crowdloan' && method == 'Contributed') {
+              logger.info(`In block #${block} find contribute event, signer: ${signer}`)
+              if(signer == getStringEnv('RELAY_SOVEREIGN')) {
+                contribute_list.push({signer, contributed, crowdloan})
+                logger.warn(`In block #${block}, it was found contributed ${contributed} to our crowdloan ${crowdloan}.`)
+              }
             }
-          }
-        })
+          })
+          resolve('')
+        }))
       }
+      await Promise.all(filterEvent)
       logger.warn(`This vrf found that ${contribute_list.length} contributions.`)
     }
 }
