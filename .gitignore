@@ -3,3 +3,5 @@ node_modules
 .history
 logs
 .vscode
+*.json
+__pycache__

@@ -6,6 +6,8 @@
   "scripts": {
     "fetch-relay": "ts-node src/index.ts -fr",
     "fetch-para": "ts-node src/index.ts -fp",
+    "dump-relay": "ts-node src/index.ts -dr",
+    "dump-para": "ts-node src/index.ts -dp",
     "process": "ts-node src/index.ts -p"
   },
   "author": "",

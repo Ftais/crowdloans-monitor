@@ -5,15 +5,16 @@ import { SubstrateConfig } from '../utils/config'
 import { KeyringPair } from '@polkadot/keyring/types'
 
 export let relayApi: ApiPromise
-export let relayAgent: KeyringPair
+// export let relayAgent: KeyringPair
+export let relayKeyring: Keyring
+export let relaySs58Prefix: number
 
 export namespace RelayConnection {
   export async function init (relay: SubstrateConfig) {
     relayApi = await ApiPromise.create({
       provider: new WsProvider(relay.endpoint)
     } as ApiOptions)
-
-    relayAgent = new Keyring({ type: 'sr25519' }).addFromMnemonic(relay.agent)
+    // relayAgent = relayKeyring.addFromMnemonic(relay.agent)
 
     logger.info(`Connected endpoint: ${relay.endpoint}`)
   }
